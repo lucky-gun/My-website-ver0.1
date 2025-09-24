@@ -1,0 +1,12 @@
+FROM mediawiki:latest
+
+RUN set -ex; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends $PHPIZE_DEPS; \
+    pecl install redis igbinary; \
+    docker-php-ext-enable redis igbinary; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $PHPIZE_DEPS; \
+    rm -rf /var/lib/apt/lists/*
+
+# (선택) OPcache/APCu 튜닝 ini 추가
+# COPY php/conf.d/99-performance.ini /usr/local/etc/php/conf.d/99-performance.ini

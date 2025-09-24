@@ -1,0 +1,188 @@
+services:
+  my_traefik:
+    image: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8082:8082"
+    environment:
+      - CF_DNS_API_TOKEN=W50Fs-7sb5HikltJxcVLO2EpJiXfg1xwmqpNo6AG
+      - TZ=Asia/Seoul
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/log:/var/log/traefik
+      - ./traefik/data:/etc/traefik
+    networks:
+      - frontend
+      - security
+      - monitoring
+
+  my_wordpress:
+    image: wordpress
+    restart: unless-stopped
+    read_only: true
+    user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+      - /var/run/apache2
+    env_file: ./wordpress/.env
+    volumes:
+      - ./wordpress/wp-content:/var/www/html/wp-content
+      - ./wordpress/wp-config.php:/var/www/html/wp-config.php:ro
+    networks:
+      - frontend
+
+  my_mediawiki:
+    build:
+      context: ./mediawiki
+      dockerfile: Dockerfile_mediawiki
+    restart: unless-stopped
+    read_only: true
+    user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+      - /var/run/apache2
+    environment:
+      - MW_REDIS_PASSWORD=redis_pass
+      - TZ=Asia/Seoul
+    volumes:
+      - ./mediawiki/images:/var/www/html/images
+      - ./mediawiki/extensions:/var/www/html/extensions
+      - ./mediawiki/skins:/var/www/html/skins
+      - ./mediawiki/my_apcu.ini:/usr/local/etc/php/conf.d/my_apcu.ini:ro
+      # - ./mediawiki/LocalSettings.php:/var/www/html/LocalSettings.php:ro
+      #  https://github.com/AirHelp/mediawiki-docker/blob/master/README.md
+      #  볼륨 먼저 생성 시 덮어쓰기로 인해 안의 파일들이 모두 삭제되어
+      #  먼저 생성 후 다시 복사/붙여넣기 진행 필요
+    networks:
+      - frontend
+
+  my_cadvisor:
+    image: bitnami/cadvisor
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - monitoring
+
+  my_node_exporter:
+    image: prom/node-exporter
+    restart: unless-stopped
+    pid: "host"
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+    networks:
+      - monitoring
+
+  my_modsec:
+    build:
+      context: ./modsecurity/docker_file
+      dockerfile: Dockerfile_modsecurity
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ./modsecurity/log:/var/log/modsecurity
+    depends_on:
+      - my_mediawiki
+    networks:
+      - security
+      - frontend
+
+  my_fail2ban:
+    image: linuxserver/fail2ban
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - VERBOSITY=-vv
+      - TZ=Asia/Seoul
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./fail2ban/config:/config
+      - ./traefik/log:/config/log/traefik:rw
+      - ./modsecurity/log:/config/log/modsecurity:rw
+
+  my_alloy:
+    image: grafana/alloy
+    restart: unless-stopped
+    user: root
+    cap_add:
+      - SYSLOG
+    environment:
+      - TZ=Asia/Seoul
+    command:
+      - run
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.river
+    volumes:
+      - ./alloy/config.river:/etc/alloy/config.river:ro
+      - ./alloy/data:/var/lib/alloy/data
+
+      # ModSecurity 로그
+      - ./modsecurity/log/audit.log:/var/log/modsecurity/audit.log:ro
+
+      # Fail2Ban 로그
+      - ./fail2ban/config/log/fail2ban/fail2ban.log:/var/log/fail2ban/fail2ban.log:ro
+
+      # Traefik 로그
+      - ./traefik/log/access.log:/var/log/traefik/access.log:ro
+    networks:
+      - monitoring
+      - frontend
+
+  my_portainer_agent:
+    image: portainer/agent
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+      - /:/host
+
+networks:
+  frontend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+    internal: false
+
+  monitoring:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+    internal: true
+
+  security:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.24.0.0/24
+    internal: true
