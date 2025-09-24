@@ -1,0 +1,296 @@
+services:
+  my_mysql:
+    image: mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root1234!
+      - TZ=Asia/Seoul
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/config:/etc/mysql/conf.d
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 50
+      start_period: 30s
+    networks:
+      - pv_net
+
+  my_dbgate:
+    image: dbgate/dbgate
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=my_mysql
+      - TZ=Asia/Seoul
+    volumes:
+      - ./dbgate:/root/.dbgate
+    networks:
+      - pv_net
+
+  my_portainer:
+    image: portainer/portainer
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "9000:9000"
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ./portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - pv_net
+
+  my_cadvisor:
+    image: bitnami/cadvisor
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - pv_net
+
+  my_node_exporter:
+    image: prom/node-exporter
+    restart: unless-stopped
+    pid: host
+    environment:
+      - TZ=Asia/Seoul
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - pv_net
+
+  my_prometheus:
+    image: prom/prometheus
+    restart: unless-stopped
+    ports:
+      - "9091:9090"
+    environment:
+      - TZ=Asia/Seoul
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d   # 보존기간 예시
+      - --storage.tsdb.wal-compression
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/config:/etc/prometheus:ro
+      - ./prometheus/data:/prometheus
+    depends_on:
+      - my_cadvisor
+    extra_hosts:
+      - nodeexporter.lucky-gun.com:10.0.0.100
+      - cadvisor.lucky-gun.com:10.0.0.100
+    networks:
+      - pv_net
+
+  my_grafana:
+    image: grafana/grafana
+    restart: unless-stopped
+    ports:
+      - "3010:3000"
+    env_file: ./grafana/.env
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - pv_net
+
+  my_alertmanager:
+    image: prom/alertmanager
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - pv_net
+
+  my_loki:
+    image: grafana/loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    environment:
+      - TZ=Asia/Seoul
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki/config.yaml:/etc/loki/local-config.yaml:ro
+      - ./loki/var:/var/loki
+      - ./loki/rulestorage:/etc/loki/rulestorage
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - pv_net
+
+
+  ##################################
+  # NEXTCLOUD 영역
+  ##################################
+
+  my_nextcloud:
+    build:
+      context: ./nextcloud
+      dockerfile: Dockerfile_nextcloud
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+      - /var/run/apache2
+    env_file: ./nextcloud/.env
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ./nextcloud/data:/var/www/html/data
+      - ./nextcloud/config:/var/www/html/config
+      - ./nextcloud/custom_apps:/var/www/html/custom_apps
+      - ./nextcloud/themes:/var/www/html/themes
+    depends_on:
+      my_redis:
+        condition: service_started
+      my_mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "grep -q \"'installed' => true\" /var/www/html/config/config.php || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+      start_period: 10s
+    networks:
+      - pv_net
+
+  my_redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      - TZ=Asia/Seoul
+    command: >
+      redis-server
+      --appendonly no
+      --save 60 1000
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass "redis_pass"
+      --protected-mode yes
+      --bind 0.0.0.0
+    networks:
+      - pv_net
+
+  my_notify_push:
+    build:
+      context: https://github.com/nextcloud/notify_push.git#main
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "7867:7867"
+    environment:
+      - NEXTCLOUD_URL=http://my_nextcloud:80
+      - TZ=Asia/Seoul
+    entrypoint: ["/notify_push"]
+    command: ["/var/www/html/config/config.php"]
+    volumes:
+      - ./nextcloud/config:/var/www/html/config:ro
+    depends_on:
+      - my_nextcloud
+      - my_redis
+    networks:
+      - pv_net
+
+  my_nextcloud_cron:
+    image: nextcloud:latest
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Seoul
+    entrypoint: /cron.sh
+    volumes:
+      - ./nextcloud/data:/var/www/html/data
+      - ./nextcloud/config:/var/www/html/config
+      - ./nextcloud/custom_apps:/var/www/html/custom_apps
+      - ./nextcloud/themes:/var/www/html/themes
+    depends_on:
+      my_nextcloud:
+        condition: service_healthy
+    networks:
+      - pv_net
+
+  my_nextcloud_autosetup:
+    image: nextcloud:latest
+    restart: "no"
+    environment:
+      - TZ=Asia/Seoul
+    command:
+      - /bin/bash
+      - -lc
+      - >
+        set -e
+        echo "[nc-autosetup] wait for install..."
+        until [ -f /var/www/html/config/config.php ]; do sleep 2; done
+        until php occ status | grep -q "installed: true"; do sleep 2; done
+
+        echo "[nc-autosetup] apply Redis/APCu & domain configs..."
+        php occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"
+        php occ config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"
+        php occ config:system:set filelocking.enabled --type=bool --value=true
+        php occ config:system:set redis host --value=redis
+        php occ config:system:set redis port --type=integer --value=6379
+        php occ config:system:set trusted_domains 0 --value=cloud.lucky-gun.com
+        php occ config:system:set overwritehost --value=cloud.lucky-gun.com
+        php occ config:system:set overwriteprotocol --value=https
+        php occ background:cron
+
+        echo "[nc-autosetup] install/enable notify_push..."
+        php occ app:install notify_push || php occ app:enable notify_push
+
+        echo "[nc-autosetup] run notify_push:setup (non-blocking)..."
+        php occ notify_push:setup https://cloud.lucky-gun.com/push || true
+
+        echo "[nc-autosetup] done."
+    volumes:
+      - ./nextcloud/data:/var/www/html/data
+      - ./nextcloud/config:/var/www/html/config
+      - ./nextcloud/custom_apps:/var/www/html/custom_apps
+      - ./nextcloud/themes:/var/www/html/themes   # 쓰는 경우만
+    depends_on:
+      - my_nextcloud
+      - my_redis
+    networks:
+      - pv_net
+
+networks:
+  pv_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.0.0/16
+    internal: false

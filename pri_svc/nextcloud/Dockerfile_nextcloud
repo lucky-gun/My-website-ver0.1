@@ -1,0 +1,12 @@
+FROM nextcloud:latest
+
+RUN set -eux; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends smbclient; \
+    PHPV="$(php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;')"; \
+    if apt-cache show "php${PHPV}-smbclient" >/dev/null 2>&1; then \
+      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "php${PHPV}-smbclient"; \
+    else \
+      echo "php${PHPV}-smbclient not available, skipping."; \
+    fi; \
+    rm -rf /var/lib/apt/lists/*

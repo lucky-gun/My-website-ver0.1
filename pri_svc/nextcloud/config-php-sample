@@ -1,0 +1,61 @@
+<?php
+$CONFIG = array (
+  'htaccess.RewriteBase' => '/',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'apps_paths' =>
+  array (
+    0 =>
+    array (
+      'path' => '/var/www/html/apps',
+      'url' => '/apps',
+      'writable' => false,
+    ),
+    1 =>
+    array (
+      'path' => '/var/www/html/custom_apps',
+      'url' => '/custom_apps',
+      'writable' => true,
+    ),
+  ),
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'redis' =>
+  array (
+    'host' => 'my_redis',
+    'password' => 'redis_pass',
+    'port' => 6379,
+  ),
+  'upgrade.disable-web' => true,
+  'passwordsalt' => 'LZ5TGMTVPZ7M67tQmfa/w/dNTQlKa5',
+  'secret' => '0D17PqzF7O3Ai0qcu1f2I+E9T5Tld5whim8OKHrTx5cDTIpO',
+  'trusted_domains' =>
+  array (
+    0 => 'cloud.lucky-gun.com',
+  ),
+  'datadirectory' => '/var/www/html/data',
+  'dbtype' => 'mysql',
+  'version' => '31.0.8.1',
+  'overwrite.cli.url' => 'https://cloud.lucky-gun.com',
+  'overwritehost' => 'cloud.lucky-gun.com',
+  'overwriteprotocol' => 'https',
+  'trusted_proxies' => [
+    //공인 ip 추가(선택) + 도커 대역대 추가 (필수)
+    '192.168.48.0/20',
+    //내부망
+    '10.0.0.0/8',
+    //CF 대역대 중 일부
+    '162.158.0.0/15',
+    '172.64.0.0/13',
+    '131.0.72.0/22',
+  ],
+
+  'dbname' => 'nextcloud_db',
+  'dbhost' => 'my_mysql',
+  'dbport' => '',
+  'dbtableprefix' => 'oc_',
+  'mysql.utf8mb4' => true,
+  'dbuser' => 'next_admin',
+  'dbpassword' => 'next_pass',
+  'installed' => true,
+  'instanceid' => 'octs7eob1j0x',
+);
