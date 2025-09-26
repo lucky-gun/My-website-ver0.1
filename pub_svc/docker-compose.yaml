@@ -7,7 +7,7 @@ services:
       - "443:443"
       - "8082:8082"
     environment:
-      - CF_DNS_API_TOKEN=W50Fs-7sb5HikltJxcVLO2EpJiXfg1xwmqpNo6AG
+      - CF_DNS_API_TOKEN=fPjw7b6s355V7v9FYJoxgZw-NoN-48Sbv8XMzmQY
       - TZ=Asia/Seoul
     command:
       - "--configFile=/etc/traefik/traefik.yml"
@@ -32,8 +32,7 @@ services:
       - /var/run/apache2
     env_file: ./wordpress/.env
     volumes:
-      - ./wordpress/wp-content:/var/www/html/wp-content
-      - ./wordpress/wp-config.php:/var/www/html/wp-config.php:ro
+      - ./wordpress/data:/var/www/html
     networks:
       - frontend
 
@@ -124,6 +123,10 @@ services:
       - PGID=1000
     volumes:
       - ./fail2ban/config:/config
+      - ./fail2ban/data/action.d:/config/fail2ban/action.d
+      - ./fail2ban/data/filter.d:/config/fail2ban/filter.d
+      - ./fail2ban/data/jail.d:/config/fail2ban/jail.d
+      - ./fail2ban/data/jail.local:/config/fail2ban/jail.local
       - ./traefik/log:/config/log/traefik:rw
       - ./modsecurity/log:/config/log/modsecurity:rw
 
