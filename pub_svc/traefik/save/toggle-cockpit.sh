@@ -1,7 +1,7 @@
 #!/bin/bash
-SRC_ON="/home/opc/pub_svc/traefik/dynamic_conf/enabled/dynamic.yml"
-SRC_OFF="/home/opc/pub_svc/traefik/dynamic_conf/disabled/dynamic.yml"
-DEST="/home/opc/pub_svc/traefik/dynamic_conf/active/dynamic.yml"
+SRC_ON="/home/opc/pub_svc/traefik/data/dynamic_conf/enabled/dynamic.yml"
+SRC_OFF="/home/opc/pub_svc/traefik/data/dynamic_conf/disabled/dynamic.yml"
+DEST="/home/opc/pub_svc/traefik/data/dynamic_conf/active/dynamic.yml"
 
 if cmp -s "$DEST" "$SRC_ON"; then
   cp "$SRC_OFF" "$DEST"
