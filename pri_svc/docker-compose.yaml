@@ -168,6 +168,7 @@ services:
       - /var/run/apache2
     env_file: ./nextcloud/.env
     volumes:
+      - nc_html:/var/www/html
       - ./nextcloud/data:/var/www/html/data
       - ./nextcloud/config:/var/www/html/config
       - ./nextcloud/custom_apps:/var/www/html/custom_apps
@@ -226,12 +227,13 @@ services:
       - pv_net
 
   my_nextcloud_cron:
-    image: nextcloud:latest
+    build:
+      context: ./nextcloud
+      dockerfile: Dockerfile_nextcloud
     restart: unless-stopped
-    environment:
-      - TZ=Asia/Seoul
     entrypoint: /cron.sh
     volumes:
+      - nc_html:/var/www/html
       - ./nextcloud/data:/var/www/html/data
       - ./nextcloud/config:/var/www/html/config
       - ./nextcloud/custom_apps:/var/www/html/custom_apps
@@ -241,6 +243,9 @@ services:
         condition: service_healthy
     networks:
       - pv_net
+
+volumes:
+  nc_html: {}
 
 networks:
   pv_net:
