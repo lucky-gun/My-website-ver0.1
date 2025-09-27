@@ -26,29 +26,43 @@ $CONFIG = array (
     'port' => 6379,
   ),
   'upgrade.disable-web' => true,
-  'passwordsalt' => 'LZ5TGMTVPZ7M67tQmfa/w/dNTQlKa5',
-  'secret' => '0D17PqzF7O3Ai0qcu1f2I+E9T5Tld5whim8OKHrTx5cDTIpO',
+  'passwordsalt' => 'cagcUmSCmxJ2ZrLZd8f8DpJ2io0f56',
+  'secret' => '7EjBtJmbv1vaWD4RvOYNuvRdWBB+WaVeMEsaRh12MrSMw8ao',
   'trusted_domains' =>
   array (
     0 => 'cloud.lucky-gun.com',
   ),
   'datadirectory' => '/var/www/html/data',
   'dbtype' => 'mysql',
-  'version' => '31.0.8.1',
+  'version' => '31.0.9.1',
   'overwrite.cli.url' => 'https://cloud.lucky-gun.com',
   'overwritehost' => 'cloud.lucky-gun.com',
-  'overwriteprotocol' => 'https',
+  'overwriteprotocol' => 'https'
   'trusted_proxies' => [
     //공인 ip 추가(선택) + 도커 대역대 추가 (필수)
-    '192.168.48.0/20',
+    '192.168.0.0/16',
+    '217.142.146.137/32',
+    '146.56.132.38/32',
+    '210.207.230.67/32',
     //내부망
-    '10.0.0.0/8',
+    '10.0.0.0/16',
     //CF 대역대 중 일부
+    '173.245.48.0/20',
+    '103.21.244.0/22',
+    '103.22.200.0/22',
+    '103.31.4.0/22',
+    '141.101.64.0/18',
+    '108.162.192.0/18',
+    '190.93.240.0/20',
+    '188.114.96.0/20',
+    '197.234.240.0/22',
+    '198.41.128.0/17',
     '162.158.0.0/15',
+    '104.16.0.0/13',
+    '104.24.0.0/14',
     '172.64.0.0/13',
     '131.0.72.0/22',
   ],
-
   'dbname' => 'nextcloud_db',
   'dbhost' => 'my_mysql',
   'dbport' => '',
@@ -57,5 +71,5 @@ $CONFIG = array (
   'dbuser' => 'next_admin',
   'dbpassword' => 'next_pass',
   'installed' => true,
-  'instanceid' => 'octs7eob1j0x',
+  'instanceid' => 'ocla88msosii',
 );
