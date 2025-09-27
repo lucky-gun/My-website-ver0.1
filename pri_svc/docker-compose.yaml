@@ -242,39 +242,6 @@ services:
     networks:
       - pv_net
 
-  my_nextcloud_autosetup:
-    image: nextcloud:latest
-    restart: "no"
-    command:
-      - /bin/bash
-      - -lc
-      - |
-        set -e
-        echo "[nc-autosetup] wait for install..."
-        until [ -f /var/www/html/config/config.php ]; do sleep 2; done
-        until php occ status | grep -q "installed: true"; do sleep 2; done
-
-        echo "[nc-autosetup] apply Redis/APCu & domain configs..."
-        php occ background:cron
-
-        echo "[nc-autosetup] install/enable notify_push..."
-        php occ app:install notify_push || php occ app:enable notify_push
-
-        echo "[nc-autosetup] run notify_push:setup (non-blocking)..."
-        php occ notify_push:setup https://cloud.lucky-gun.com/push || true
-
-        echo "[nc-autosetup] done."
-    volumes:
-      - ./nextcloud/data:/var/www/html/data
-      - ./nextcloud/config:/var/www/html/config
-      - ./nextcloud/custom_apps:/var/www/html/custom_apps
-      - ./nextcloud/themes:/var/www/html/themes   # 쓰는 경우만
-    depends_on:
-      - my_nextcloud
-      - my_redis
-    networks:
-      - pv_net
-
 networks:
   pv_net:
     driver: bridge
