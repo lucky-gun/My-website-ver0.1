@@ -73,8 +73,10 @@ services:
       - /:/rootfs:ro
       - /var/run:/var/run
       - /sys:/sys:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro         # cgroups v2 환경이면 이 줄도 유용
       - /var/lib/docker:/var/lib/docker:ro
       - /dev/disk:/dev/disk:ro
+      - /etc/machine-id:/etc/machine-id:ro       # ★ 추가
     networks:
       - monitoring
 
