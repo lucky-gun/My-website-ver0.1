@@ -1,4 +1,4 @@
-#Public Subnet 설치 시 주의사항
+# Public Subnet 설치 시 주의사항
 
 1. 만약 web, NAT ip가 바뀔 경우, 이에 대비해 아래와 같이 모두 바꿔주어야 한다.
     1) CloudFlare의 ip 변경
