@@ -167,8 +167,6 @@ services:
       - /tmp
       - /var/run/apache2
     env_file: ./nextcloud/.env
-    environment:
-      - TZ=Asia/Seoul
     volumes:
       - ./nextcloud/data:/var/www/html/data
       - ./nextcloud/config:/var/www/html/config
