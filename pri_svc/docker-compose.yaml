@@ -255,14 +255,6 @@ services:
         until php occ status | grep -q "installed: true"; do sleep 2; done
 
         echo "[nc-autosetup] apply Redis/APCu & domain configs..."
-        php occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"
-        php occ config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"
-        php occ config:system:set filelocking.enabled --type=bool --value=true
-        php occ config:system:set redis host --value=redis
-        php occ config:system:set redis port --type=integer --value=6379
-        php occ config:system:set trusted_domains 0 --value=cloud.lucky-gun.com
-        php occ config:system:set overwritehost --value=cloud.lucky-gun.com
-        php occ config:system:set overwriteprotocol --value=https
         php occ background:cron
 
         echo "[nc-autosetup] install/enable notify_push..."
