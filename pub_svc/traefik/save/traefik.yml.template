@@ -49,8 +49,7 @@ providers:
     exposedByDefault: false
 
 log:
-  level: DEBUG
-  filePath: "/var/log/traefik/traefik.log"
+  level: INFO
   format: common
 
 accessLog:
