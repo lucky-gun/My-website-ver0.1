@@ -245,8 +245,6 @@ services:
   my_nextcloud_autosetup:
     image: nextcloud:latest
     restart: "no"
-    environment:
-      - TZ=Asia/Seoul
     command:
       - /bin/bash
       - -lc
