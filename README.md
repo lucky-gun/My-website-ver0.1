@@ -7,7 +7,7 @@
 5. grafana import의 경우, node_exporter 기반 1860, 9276, 11074 / cAdvisor 기준 193, 179, 12275
 
 설치 하기
-php occ status | grep -q "installed: true";
-php occ background:cron
-php occ app:install notify_push || php occ app:enable notify_push
+php occ status | grep -q "installed: true";\
+php occ background:cron\
+php occ app:install notify_push || php occ app:enable notify_push\
 php occ notify_push:setup https://cloud.lucky-gun.com/push || true
