@@ -14,6 +14,5 @@ php occ app:install notify_push || php occ app:enable notify_push\
 php occ notify_push:setup https://cloud.lucky-gun.com/push || true
 
 
-docker volume create nc_html \
-sudo docker run --rm -v nc_html:/html $(sudo docker build -q -f ./nextcloud/Dockerfile_nextcloud ./nextcloud) \ \
-  bash -lc 'cp -a /usr/src/nextcloud/. /html && chown -R 33:33 /html'
+sudo docker volume create pri_svc_nc_html \
+sudo docker run --rm -v pri_svc_nc_html:/var/www/html nextcloud bash -lc 'cp -a /usr/src/nextcloud/. /var/www/html && chown -R 33:33 /var/www/html'
