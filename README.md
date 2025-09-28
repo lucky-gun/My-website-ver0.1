@@ -11,4 +11,6 @@
 php occ status | grep -q "installed: true";\
 php occ background:cron\
 php occ app:install notify_push || php occ app:enable notify_push\
+
+(setup 전 profile install 진행해야 정상적으로 설치되어집니다.)
 php occ notify_push:setup https://cloud.lucky-gun.com/push || true
