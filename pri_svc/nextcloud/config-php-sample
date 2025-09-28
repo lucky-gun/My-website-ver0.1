@@ -37,7 +37,7 @@ $CONFIG = array (
   'version' => '31.0.9.1',
   'overwrite.cli.url' => 'https://cloud.lucky-gun.com',
   'overwritehost' => 'cloud.lucky-gun.com',
-  'overwriteprotocol' => 'https'
+  'overwriteprotocol' => 'https',
   'trusted_proxies' => [
     //공인 ip 추가(선택) + 도커 대역대 추가 (필수)
     '192.168.0.0/16',
