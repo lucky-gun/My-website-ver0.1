@@ -15,5 +15,5 @@ php occ notify_push:setup https://cloud.lucky-gun.com/push || true
 
 
 docker volume create nc_html \
-docker run --rm -v nc_html:/html $(docker build -q -f ./nextcloud/Dockerfile_nextcloud ./nextcloud) \ \
+sudo docker run --rm -v nc_html:/html $(sudo docker build -q -f ./nextcloud/Dockerfile_nextcloud ./nextcloud) \ \
   bash -lc 'cp -a /usr/src/nextcloud/. /html && chown -R 33:33 /html'
