@@ -5,26 +5,10 @@
 3. nextcloud 디렉토리의 config, custom_apps, data, themes의 경우 33:tape로 변경 필요
 4. 먼저 실행 후 mediawiki의 config.php가 생기면 sample로 변경 필요
 5. grafana import의 경우, node_exporter 기반 1860, 9276, 11074 / cAdvisor 기준 193, 179, 12275
-6. 설치 시 주의사항
+6. 설치 시 주의사항 nextcloud의 모든 설정이 끝난 후 cron 돌릴 것
 
-설치 하기\
+설치 하기
 php occ status | grep -q "installed: true";\
 php occ background:cron\
 php occ app:install notify_push || php occ app:enable notify_push\
 php occ notify_push:setup https://cloud.lucky-gun.com/push || true
-
-
-1. 현재 컨테이너가 쓰는 이미지 확인 \
-IMG=$(sudo docker inspect pri_svc-my_nextcloud-1 --format '{{.Config.Image}}')
-
-2. 볼륨 생성 \
-sudo docker volume create pri_svc_nc_html
-
-3. /usr/src/nextcloud → /var/www/html 복사 + 권한 정리 (동일 이미지로!) \
-sudo docker run --rm --user root \ \
-  -v pri_svc_nc_html:/var/www/html \ \
-  "$IMG" \ \
-  bash -lc 'cp -a /usr/src/nextcloud/. /var/www/html && chown -R 33:33 /var/www/html'
-
-4. 검증 \
-sudo docker run --rm -v pri_svc_nc_html:/html alpine sh -lc "ls -lah /html | head -n 20"
