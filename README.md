@@ -14,17 +14,17 @@ php occ app:install notify_push || php occ app:enable notify_push\
 php occ notify_push:setup https://cloud.lucky-gun.com/push || true
 
 
-1. 현재 컨테이너가 쓰는 이미지 확인
+1. 현재 컨테이너가 쓰는 이미지 확인 \
 IMG=$(sudo docker inspect pri_svc-my_nextcloud-1 --format '{{.Config.Image}}')
 
-2. 볼륨 생성
+2. 볼륨 생성 \
 sudo docker volume create pri_svc_nc_html
 
-3. /usr/src/nextcloud → /var/www/html 복사 + 권한 정리 (동일 이미지로!)
+3. /usr/src/nextcloud → /var/www/html 복사 + 권한 정리 (동일 이미지로!) \
 sudo docker run --rm --user root \ \
   -v pri_svc_nc_html:/var/www/html \ \
   "$IMG" \ \
   bash -lc 'cp -a /usr/src/nextcloud/. /var/www/html && chown -R 33:33 /var/www/html'
 
-4. 검증
+4. 검증 \
 sudo docker run --rm -v pri_svc_nc_html:/html alpine sh -lc "ls -lah /html | head -n 20"
