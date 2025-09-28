@@ -170,7 +170,6 @@ services:
       - /var/run/apache2
     env_file: ./nextcloud/.env
     volumes:
-      - nc_html:/var/www/html
       - ./nextcloud/data:/var/www/html/data
       - ./nextcloud/config:/var/www/html/config
       - ./nextcloud/custom_apps:/var/www/html/custom_apps
@@ -209,6 +208,8 @@ services:
       - pv_net
 
   my_notify_push:
+    profiles:
+      - install
     build:
       context: https://github.com/nextcloud/notify_push.git#main
       dockerfile: Dockerfile
@@ -229,13 +230,18 @@ services:
       - pv_net
 
   my_nextcloud_cron:
+    profiles: ["install"]
     build:
       context: ./nextcloud
       dockerfile: Dockerfile_nextcloud
     restart: unless-stopped
-    entrypoint: /cron.sh
+    # entrypoint/command 중 하나만 쓰면 됩니다. 아래처럼 entrypoint로 래핑:
+    entrypoint: ["/bin/sh","-lc",
+      "cp -an /usr/src/nextcloud/. /var/www/html \
+       && chown -R 33:33 /var/www/html \
+       && exec /cron.sh"
+    ]
     volumes:
-      - nc_html:/var/www/html
       - ./nextcloud/data:/var/www/html/data
       - ./nextcloud/config:/var/www/html/config
       - ./nextcloud/custom_apps:/var/www/html/custom_apps
@@ -243,11 +249,7 @@ services:
     depends_on:
       my_nextcloud:
         condition: service_healthy
-    networks:
-      - pv_net
-
-volumes:
-  nc_html: {}
+    networks: [pv_net]
 
 networks:
   pv_net:
