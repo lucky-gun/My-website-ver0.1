@@ -74,10 +74,12 @@ services:
       - --path.procfs=/host/proc
       - --path.sysfs=/host/sys
       - --path.rootfs=/rootfs
+      - --path.udev.data=/run/udev/data # ← (선택) 경로 명시
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+      - /run/udev:/run/udev:ro          # ← 추가: 호스트 udev DB
     networks:
       - pv_net
 
