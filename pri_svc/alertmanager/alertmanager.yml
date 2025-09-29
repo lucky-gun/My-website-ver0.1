@@ -4,9 +4,9 @@ global:
 route:
   receiver: "slack-default"
   group_by: ['service','alertname']
-  group_wait: 2m
-  group_interval: 15m
-  repeat_interval: 4h   # 기본(기타용). 인프라/SecOps는 아래 하위 라우트로 분기
+  group_wait: 2m # 10s
+  group_interval: 15m # 10s 
+  repeat_interval: 4h   # 기본(기타용). 인프라/SecOps는 아래 하위 라우트로 분기 5m
 
   routes:
     # ── SecOps(Loki) 알림: 사실상 한 번만 발송
