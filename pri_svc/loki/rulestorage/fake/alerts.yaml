@@ -2,83 +2,68 @@ groups:
 - name: loki-secops
   interval: 1m
   rules:
-
-  # === 운영 알림 ===
+  # --- 운영 알림 ---
   - alert: High5xxRate
-    expr: |
-      sum(rate({service="traefik", stream="access", status_class="500"}[5m]))
-        / sum(rate({service="traefik", stream="access"}[5m])) > 0.02
+    expr: sum(rate({service="traefik",stream="access"}[5m])) > 0 and (sum(rate({service="traefik",stream="access",status=~"5.."}[5m])) / sum(rate({service="traefik",stream="access"}[5m])) > 0.05)
     for: 2m
-    labels:
-      severity: critical
-      service: secops
+    labels: {severity: warning, service: secops}
     annotations:
-      summary: "5xx 오류 비율이 2% 이상"
-      description: "최근 5분간 5xx 비율이 급증 (서비스 오류 가능성)"
+      summary: "5xx 비율 5% 초과"
+      description: "최근 5분 평균 요청 대비 5xx 비율이 5%를 초과"
 
-  - alert: TrafficDrop
-    expr: |
-      sum(rate({service="traefik", stream="access"}[5m])) < 1
-    for: 3m
-    labels:
-      severity: warning
-      service: secops
+  - alert: TrafficDropRelative
+    expr: (sum(rate({service="traefik",stream="access"}[10m])) < 0.30 * sum(rate({service="traefik",stream="access"}[1h]))) and (sum(rate({service="traefik",stream="access"}[1h])) > 0.05)
+    for: 10m
+    labels: {severity: warning, service: secops}
     annotations:
-      summary: "요청 트래픽 급감"
-      description: "Traefik 요청량이 비정상적으로 줄어듦 → 서비스 중단 가능성"
+      summary: "요청 트래픽 상대 급감"
+      description: "10m 평균이 1h 평균의 30% 미만이며 10분간 지속"
 
-  # === 보안 알림 ===
+  - alert: TraefikLogIngestionStall
+    expr: sum(count_over_time({service="traefik",stream="access"}[10m])) == 0
+    for: 10m
+    labels: {severity: critical, service: secops}
+    annotations:
+      summary: "Traefik 접근 로그 수집 정지"
+      description: "10분간 접근 로그가 전혀 유입되지 않음"
+
+  # --- 보안 알림 ---
   - alert: Fail2banBanTriggered
-    expr: |
-      sum(count_over_time({service="fail2ban", stream="main", action="ban"}[5m])) > 0
+    expr: sum(count_over_time({service="fail2ban",stream="main",action="ban"}[5m])) > 0
     for: 0m
-    labels:
-      severity: warning
-      service: secops
+    labels: {severity: warning, service: secops}
     annotations:
       summary: "Fail2ban Ban 발생"
-      description: "IP가 Fail2ban에 의해 차단됨 (최근 5분 이내)"
+      description: "최근 5분 이내 Ban 이벤트 감지"
 
   - alert: RepeatOffender
-    expr: |
-      topk(1, sum by (ip) (count_over_time({service="fail2ban", stream="main", action="ban"}[1h]))) > 5
+    expr: topk(1, sum by (ip) (count_over_time({service="fail2ban",stream="main",action="ban"}[1h]))) > 5
     for: 0m
-    labels:
-      severity: critical
-      service: secops
+    labels: {severity: critical, service: secops}
     annotations:
       summary: "Fail2ban 반복 차단 IP"
-      description: "동일 IP가 1시간 내 5회 이상 차단됨"
+      description: "동일 IP가 최근 1시간 5회 초과 차단"
 
   - alert: ModSecurityCritical
-    expr: |
-      sum(rate({service="modsecurity", stream="audit", severity_level="CRITICAL"}[5m])) > 0
+    expr: sum(rate({service="modsecurity",stream="audit",severity_level="CRITICAL"}[5m])) > 0
     for: 0m
-    labels:
-      severity: critical
-      service: secops
+    labels: {severity: critical, service: secops}
     annotations:
-      summary: "ModSecurity Critical 이벤트 발생"
-      description: "웹 공격 (CRITICAL 레벨) 탐지됨"
+      summary: "ModSecurity Critical 이벤트"
+      description: "CRITICAL 레벨 웹 공격 탐지"
 
   - alert: ModSecurityHigh
-    expr: |
-      sum(rate({service="modsecurity", stream="audit", severity_level="HIGH"}[5m])) > 2
+    expr: sum(rate({service="modsecurity",stream="audit",severity_level="HIGH"}[5m])) > 2
     for: 5m
-    labels:
-      severity: warning
-      service: secops
+    labels: {severity: warning, service: secops}
     annotations:
-      summary: "ModSecurity High 이벤트 다수 발생"
-      description: "최근 5분간 HIGH 레벨 이벤트 2건 이상"
+      summary: "ModSecurity HIGH 다발"
+      description: "최근 5분간 HIGH 레벨 이벤트 2건 초과"
 
   - alert: Top404Scanner
-    expr: |
-      topk(1, sum by (path) (count_over_time(({service="traefik", stream="access", status="404"} | json | label_format path="{{.path}}") [5m]))) > 50
+    expr: topk(1, sum by (path) (count_over_time(({service="traefik",stream="access",status="404"} | json | label_format path="{{.path}}")[5m]))) > 50
     for: 2m
-    labels:
-      severity: warning
-      service: secops
+    labels: {severity: warning, service: secops}
     annotations:
       summary: "404 다량 발생"
-      description: "특정 Path에서 5분간 50회 이상 404 발생 → 스캐닝 의심"
+      description: "특정 경로에서 5분 50회 초과 404 발생(스캐닝 의심)"
