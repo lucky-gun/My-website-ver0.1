@@ -8,16 +8,17 @@
 
 ### Nextcloud 설치 명령어 모음
 1. php occ app:install notify_push || php occ app:enable notify_push \
-   php occ notify_push:setup https://cloud.lucky-gun.com/push || true  (해당 명령어는 profile install 이후 가능합니다.)
-2. php occ background:cron \
+   php occ notify_push:setup https://cloud.lucky-gun.com/push || true  (해당 명령어는 profile install 이후 가능합니다.) \
+   php occ config:system:get appstoreenabled
+3. php occ background:cron \
    php occ config:system:set maintenance_window_start --type=integer --value=17 \
    php occ config:system:get maintenance_window_start
-3. php occ maintenance:mode --on \
+4. php occ maintenance:mode --on \
    php occ maintenance:repair --include-expensive \
    php occ maintenance:mode --off
-4. php occ config:system:set default_phone_region --value="KR"
-5. php occ maintenance:mimetype:update-js || true
-6. openssl rand 32 | base64 (외부저장소 이용시)
+5. php occ config:system:set default_phone_region --value="KR"
+6. php occ maintenance:mimetype:update-js || true
+7. openssl rand 32 | base64 (외부저장소 이용시)
 
 ### mysql 작업하기
 <pre><code>"mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -uroot -p'\$MYSQL_ROOT_PASSWORD' mysql" </code></pre>
