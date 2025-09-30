@@ -53,6 +53,7 @@ services:
       - TZ=Asia/Seoul
     volumes:
       - mw_html:/var/www/html
+      - ./mediawiki/delete:/var/www/html/delete
       - ./mediawiki/images:/var/www/html/images
       - ./mediawiki/my_apcu.ini:/usr/local/etc/php/conf.d/my_apcu.ini:ro
       # - ./mediawiki/LocalSettings.php:/var/www/html/LocalSettings.php:ro
