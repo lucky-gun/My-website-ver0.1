@@ -4,8 +4,17 @@
 2. loki의 소유명 10001:10001로 변경하기 (rulestorage, var)
 3. nextcloud 디렉토리의 config, custom_apps, data, themes의 경우 33:tape로 변경 필요
 4. 먼저 실행(profile install 제외) 후 nextcloud의 config.php가 생기면 sample로 변경 필요 (실시간 반영이기에 따로 restart 할 필요 없음)
-5. 이후 profile install 진행 후 전체 시작
+5. 이후 profile install 진행 후 전체 시작 (이때는 notify_push install 진행 필요 자세한 건 아래 내용 참조)
 6. grafana import의 경우, node_exporter 기반 1860, 9276, 11074 / cAdvisor 기준 193, 179, 12275
+
+Nextcloud 설치 명령어 모음
+## 1. php occ app:install notify_push || php occ app:enable notify_push
+2. 
+3. 
+
+
+[ 4번에서 5번 진행 전 작업할 것 ]
+1. php occ app
 
 설치 하기 (4번 작업 이후 5번으로 가기 전 nextcloud 설치 진행 필수)
 php occ status | grep -q "installed: true";\
