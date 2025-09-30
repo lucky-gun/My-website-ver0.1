@@ -173,6 +173,9 @@ services:
     networks:
       - monitoring
 
+volumes:
+  nc_html: {}
+
 networks:
   frontend:
     driver: bridge
