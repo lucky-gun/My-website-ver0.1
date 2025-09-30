@@ -65,6 +65,7 @@ services:
   my_cadvisor:
     image: bitnami/cadvisor
     restart: unless-stopped
+    privileged: true
     environment:
       - TZ=Asia/Seoul
     volumes:
