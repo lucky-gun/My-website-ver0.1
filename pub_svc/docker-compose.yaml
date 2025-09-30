@@ -174,7 +174,7 @@ services:
       - frontend
 
 volumes:
-  nc_html: {}
+  mw_html: {}
 
 networks:
   frontend:
