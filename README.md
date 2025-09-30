@@ -23,3 +23,10 @@
 ### mysql 작업하기
 <pre><code>"mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -uroot -p'\$MYSQL_ROOT_PASSWORD' mysql" </code></pre>
 
+## 만약 app 연결이 안되어있으면
+php occ maintenance:mode --off \
+php occ config:system:set appstoreenabled --type=boolean --value=true \
+php occ config:system:set appstoreurl --value="https://apps.nextcloud.com/api/v1" \
+php occ config:system:get appstoreenabled \
+php occ config:system:get appstoreurl
+
