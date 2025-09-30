@@ -1,5 +1,4 @@
-# Private Subnet 설치 시 주의 사항
-
+### Private Subnet 설치 시 주의 사항
 1. prometheus, grafana의 data 디렉토리의 경우 반드시 777로 변경 필요
 2. loki의 소유명 10001:10001로 변경하기 (rulestorage, var)
 3. nextcloud 디렉토리의 config, custom_apps, data, themes의 경우 33:tape로 변경 필요
@@ -7,19 +6,19 @@
 5. 이후 profile install 진행 후 전체 시작 (이때는 notify_push install 진행 필요 자세한 건 아래 내용 참조)
 6. grafana import의 경우, node_exporter 기반 1860, 9276, 11074 / cAdvisor 기준 193, 179, 12275
 
-Nextcloud 설치 명령어 모음
-## 1. php occ app:install notify_push || php occ app:enable notify_push
-2. 
-3. 
+### Nextcloud 설치 명령어 모음
+1. php occ app:install notify_push || php occ app:enable notify_push \
+   php occ notify_push:setup https://cloud.lucky-gun.com/push || true  (해당 명령어는 profile install 이후 가능합니다.)
+2. php occ background:cron \
+   php occ config:system:set maintenance_window_start --type=integer --value=17 \
+   php occ config:system:get maintenance_window_start
+3. php occ maintenance:mode --on \
+   php occ maintenance:repair --include-expensive \
+   php occ maintenance:mode --off
+4. php occ config:system:set default_phone_region --value="KR"
+5. php occ maintenance:mimetype:update-js || true
+6. openssl rand 32 | base64 (외부저장소 이용시)
 
+### mysql 작업하기
+<pre><code>"mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -uroot -p'\$MYSQL_ROOT_PASSWORD' mysql" </code></pre>
 
-[ 4번에서 5번 진행 전 작업할 것 ]
-1. php occ app
-
-설치 하기 (4번 작업 이후 5번으로 가기 전 nextcloud 설치 진행 필수)
-php occ status | grep -q "installed: true";\
-php occ background:cron\
-php occ app:install notify_push || php occ app:enable notify_push\
-
-(setup 전 profile install 진행해야 정상적으로 설치되어집니다.)
-php occ notify_push:setup https://cloud.lucky-gun.com/push || true
