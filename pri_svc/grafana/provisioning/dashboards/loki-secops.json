@@ -362,7 +362,8 @@
               "service": true,
               "service_name": true,
               "source": true,
-              "stream": true
+              "stream": true,
+              "detected_level": true
             },
             "indexByName": {
               "Time": 0,
