@@ -162,6 +162,7 @@ loki.process "modsec_audit" {
   stage.timestamp {
     source = "ts"
     format = "Mon Jan 02 15:04:05 2006"
+    location = "Asia/Seoul"
   }
 
   // 첫 메시지 디테일
