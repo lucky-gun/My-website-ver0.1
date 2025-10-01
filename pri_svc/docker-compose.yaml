@@ -192,6 +192,18 @@ services:
     networks:
       - pv_net
 
+  my_nextcloud_api_proxy:
+    image: ghcr.io/nextcloud/nextcloud-appapi-dsp:release
+    environment:
+      - NC_HAPROXY_PASSWORD=rlckrlrhkstk104!
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - "2375"
+    networks:
+      pv_net:
+        aliases:
+          - docker-socket-proxy  ## 물론 나중 연결 시 host에 docker-socket-proxy:2375가 아닌 my_nextcloud_api_proxy로 서비스명으로 진행해도 괜찮습니다.
   my_redis:
     image: redis:7-alpine
     restart: unless-stopped
