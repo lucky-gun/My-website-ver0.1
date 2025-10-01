@@ -64,7 +64,7 @@ services:
       - frontend
 
   my_cadvisor:
-    image: bitnami/cadvisor
+    image: gcr.io/cadvisor/cadvisor
     restart: unless-stopped
     privileged: true
     environment:
