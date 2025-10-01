@@ -19,3 +19,6 @@ $wgJobTypeConf['default'] = [
   'redisServer' => '10.0.2.100:6379',
   'redisConfig' => [ 'password' => getenv('MW_REDIS_PASSWORD') ?: null ],
 ];
+
+$wgLocaltimezone = 'Asia/Seoul';
+$wgDefaultUserOptions['timecorrection'] = 'ZoneInfo|0|' . $wgLocaltimezone;
