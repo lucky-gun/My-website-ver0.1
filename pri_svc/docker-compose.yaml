@@ -49,7 +49,7 @@ services:
       - pv_net
 
   my_cadvisor:
-    image: bitnami/cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
     restart: unless-stopped
     environment:
       - TZ=Asia/Seoul
