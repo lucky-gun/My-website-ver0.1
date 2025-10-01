@@ -200,10 +200,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
       - "2375"
+    depends_on:
+      my_nextcloud:
+        condition: service_healthy
     networks:
       pv_net:
         aliases:
           - docker-socket-proxy  ## 물론 나중 연결 시 host에 docker-socket-proxy:2375가 아닌 my_nextcloud_api_proxy로 서비스명으로 진행해도 괜찮습니다.
+          
   my_redis:
     image: redis:7-alpine
     restart: unless-stopped
