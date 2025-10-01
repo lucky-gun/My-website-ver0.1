@@ -23,7 +23,8 @@
    https://cloud.lucky-gun.com --set-default \
    --haproxy_password 'rlckrlrhkstk104!' \
    --net pri_svc_pv_net
-8. openssl rand 32 | base64 (외부저장소 이용시)
+8. php occ db:add-missing-indices
+9. openssl rand 32 | base64 (외부저장소 이용시)
 
 ### mysql 작업하기
 <pre><code>"mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -uroot -p'\$MYSQL_ROOT_PASSWORD' mysql" </code></pre>
