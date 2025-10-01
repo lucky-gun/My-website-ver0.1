@@ -107,7 +107,9 @@ services:
     environment:
       - TZ=Asia/Seoul
     volumes:
-      - ./modsecurity/data:/etc/modsecurity
+      - ./modsecurity/data/modsecurity.conf:/etc/modsecurity/modsecurity.conf
+      - ./modsecurity/data/local-whitelist.conf:/etc/modsecurity/local-whitelist.conf
+      - ./modsecurity/data/whitelist_admin_ips.txt:/etc/modsecurity/whitelist_admin_ips.txt
       - ./modsecurity/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./modsecurity/nginx/apps.conf:/etc/nginx/conf.d/apps.conf
       - ./modsecurity/log:/var/log/modsecurity
