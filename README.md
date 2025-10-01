@@ -27,7 +27,7 @@
 9. openssl rand 32 | base64 (외부저장소 이용시)
 
 ### mysql 작업하기
-<pre><code>"mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -uroot -p'\$MYSQL_ROOT_PASSWORD' mysql" </code></pre>
+<pre><code>mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -h my_mysql -P 3306 -ugate_admin -pgate_pass mysql </code></pre>
 
 ## 만약 app 연결이 안되어있으면
 php occ maintenance:mode --off \
