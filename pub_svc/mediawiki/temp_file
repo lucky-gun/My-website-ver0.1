@@ -1,3 +1,5 @@
+## 단 설정 전 충돌날 수 있으니 충돌나는 부분있는지 확인할 것
+
 $wgMainCacheType    = CACHE_ACCEL;
 $wgMessageCacheType = CACHE_ACCEL;
 
