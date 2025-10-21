@@ -38,7 +38,7 @@ receivers:
           [{{ .Status | toUpper }}] {{ (index .Alerts 0).Labels.alertname }}
           Summary: {{ (index .Alerts 0).Annotations.summary }}
           Description: {{ (index .Alerts 0).Annotations.description }}
-        api_url: "https://hooks.slack.com/services/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"
+        api_url: ""
 
   - name: "slack-once"
     slack_configs:
@@ -50,7 +50,7 @@ receivers:
           [{{ .Status | toUpper }}] {{ (index .Alerts 0).Labels.alertname }}
           Summary: {{ (index .Alerts 0).Annotations.summary }}
           Description: {{ (index .Alerts 0).Annotations.description }}
-        api_url: "https://hooks.slack.com/services/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"
+        api_url: ""
 
 inhibit_rules:
   - source_match:
