@@ -28,9 +28,6 @@ http:
     ip-whitelist:
       ipAllowList:                # ← 권장 표기 (소문자 i)
         sourceRange:
-          - "210.207.230.67/32"
-          - "217.142.146.137/32"
-          - "146.56.132.38/32"
         ipStrategy:
           depth: 1
 
