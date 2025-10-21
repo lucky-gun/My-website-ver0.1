@@ -5,7 +5,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=root1234!
+      - MYSQL_ROOT_PASSWORD=
       - TZ=Asia/Seoul
     volumes:
       - ./mysql/data:/var/lib/mysql
@@ -195,7 +195,7 @@ services:
   my_nextcloud_api_proxy:
     image: ghcr.io/nextcloud/nextcloud-appapi-dsp:release
     environment:
-      - NC_HAPROXY_PASSWORD=rlckrlrhkstk104!
+      - NC_HAPROXY_PASSWORD=
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
@@ -221,7 +221,7 @@ services:
       --save 60 1000
       --maxmemory 256mb
       --maxmemory-policy allkeys-lru
-      --requirepass "redis_pass"
+      --requirepass ""
       --protected-mode yes
       --bind 0.0.0.0
     networks:
