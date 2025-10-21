@@ -7,7 +7,7 @@ services:
       - "443:443"
       - "8082:8082"
     environment:
-      - CF_DNS_API_TOKEN=fPjw7b6s355V7v9FYJoxgZw-NoN-48Sbv8XMzmQY
+      - CF_DNS_API_TOKEN=
       - TZ=Asia/Seoul
     command:
       - "--configFile=/etc/traefik/traefik.yml"
@@ -49,7 +49,7 @@ services:
       - /tmp
       - /var/run/apache2
     environment:
-      - MW_REDIS_PASSWORD=redis_pass
+      - MW_REDIS_PASSWORD=
       - TZ=Asia/Seoul
     volumes:
       - mw_html:/var/www/html
