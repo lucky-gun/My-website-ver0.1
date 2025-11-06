@@ -1,3 +1,5 @@
+!! 주의 반드시 (main / private Branch 둘다 설치해야합니다.)
+
 # Public Subnet 설치 시 주의사항
 
 1. traefik의 acme.json의 경우 600으로 변경
