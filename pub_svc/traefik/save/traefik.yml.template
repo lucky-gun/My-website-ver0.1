@@ -22,7 +22,7 @@ api:
 certificatesResolvers:
   myresolver:
     acme:
-      email: fallsky104@gmail.com
+      email: 
       storage: /etc/traefik/letsencrypt/acme.json
       dnsChallenge:
         provider: cloudflare
